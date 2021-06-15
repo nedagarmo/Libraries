@@ -3,5 +3,11 @@ from abc import ABC
 
 class IRepository(ABC):
 
-    def insert(self, instance):
+    async def get(self, payload):
+        pass
+
+    async def all(self):
+        pass
+
+    async def insert(self, instance):
         pass

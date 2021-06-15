@@ -14,22 +14,9 @@ from src.application import (
 )
 from infrastructure.controllers.exceptions import BadRequestException
 from infrastructure.controllers.utils import utility
-from src.infrastructure.database import (
-    close_db_connection,
-    init_db_engine,
-    db_connect
-)
-from src.infrastructure.repositories import BookRepository
 
 
 app = Flask(__name__)
-
-
-def get_db_connection(app):
-    if 'db_con' not in g:
-        db_engine = app.config.get('DB_ENGINE', None) or init_db_engine()
-        g.db_con = db_connect(db_engine)
-    return g.db_con
 
 
 @app.errorhandler(BadRequestException)
@@ -55,19 +42,9 @@ def search():
     if request.method == 'GET':
         return jsonify({'status': 'alive!'})
 
-    data = SearchBook().do(
-        payload='',
-        repository=BookRepository(get_db_connection(app))
-    )
+    data = SearchBook().do()
 
     return jsonify(data)
-
-
-@app.teardown_appcontext
-def teardown_db(exception=None):
-    db_con = g.pop('db_con', None)
-    if db_con is not None:
-        close_db_connection(db_con)
 
 
 if __name__ == '__main__':
