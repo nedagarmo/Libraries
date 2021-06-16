@@ -1,5 +1,8 @@
-from exceptions import BadRequestException
+import json
+import decimal
 
 
-def utility():
-    pass
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
+            return float(obj)

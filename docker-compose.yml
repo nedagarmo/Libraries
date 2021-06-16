@@ -6,7 +6,5 @@ services:
             - ./src/:/usr/src/app/
         ports:
             - 8000:8000
-        environment:
-            HOST: "0.0.0.0"
-            PORT: 8000
-            FLASK_DEBUG: 1
+        env_file:
+            - ./.env

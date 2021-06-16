@@ -1,5 +1,5 @@
 import aioboto3
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 
 from ...config import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 from ...domain import IRepository
@@ -11,13 +11,38 @@ class BaseRepository(IRepository):
         self.table_name = None
         self.service = 'dynamodb'
         self.region = 'us-east-2'
+        self.key_schema = None
 
-    async def get(self, payload):
+    async def get(self, query):
+        async with aioboto3.resource(self.service, region_name=self.region, aws_access_key_id=AWS_ACCESS_KEY_ID,
+                                     aws_secret_access_key=AWS_SECRET_ACCESS_KEY) as client:
+            table = await client.Table(self.table_name)
+            result = await table.scan(
+                FilterExpression=Attr('book_name').contains(query) | Attr('book_subtitle').contains(query)
+                                                                   | Attr('book_authors').contains(query)
+                                                                   | Attr('book_categories').contains(query)
+                                                                   | Attr('book_description').contains(query)
+                                                                   | Attr('book_editor').contains(query)
+                                                                   | Attr('book_external_id').contains(query)
+                                                                   | Attr('book_publication_date').contains(query)
+            )
+            return result
+
+    async def get_by_pk(self, query):
         async with aioboto3.resource(self.service, region_name=self.region, aws_access_key_id=AWS_ACCESS_KEY_ID,
                                      aws_secret_access_key=AWS_SECRET_ACCESS_KEY) as client:
             table = await client.Table(self.table_name)
             result = await table.query(
-                KeyConditionExpression=Key('name').eq('test1')
+                FilterExpression=Key(self.key_schema).eq(query)
+            )
+            return result
+
+    async def get_by(self, payload):
+        async with aioboto3.resource(self.service, region_name=self.region, aws_access_key_id=AWS_ACCESS_KEY_ID,
+                                     aws_secret_access_key=AWS_SECRET_ACCESS_KEY) as client:
+            table = await client.Table(self.table_name)
+            result = await table.scan(
+                FilterExpression=Key(payload["field"]).eq(payload["query"])
             )
             return result
 
@@ -31,4 +56,5 @@ class BaseRepository(IRepository):
         async with aioboto3.resource(self.service, region_name=self.region, aws_access_key_id=AWS_ACCESS_KEY_ID,
                                      aws_secret_access_key=AWS_SECRET_ACCESS_KEY) as client:
             table = await client.Table(self.table_name)
-            return await table.put_item(Item={'pk': instance.id, 'name': instance.name})
+            print(instance.to_dict())
+            return await table.put_item(Item=instance.to_dict())

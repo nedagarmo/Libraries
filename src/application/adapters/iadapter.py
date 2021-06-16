@@ -1,6 +1,6 @@
 from abc import ABC
 
 
-class IService(ABC):
+class IAdapter(ABC):
     async def do(self):
         pass

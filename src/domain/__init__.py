@@ -1,1 +1,1 @@
-from irepository import IRepository
+from .irepository import IRepository

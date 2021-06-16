@@ -1,4 +1,5 @@
 import os
+import asyncio
 
 from flask import (
     Flask,
@@ -6,17 +7,19 @@ from flask import (
     jsonify,
     request
 )
+from flask_cors import CORS
 
-from src.application import WrongDataException
-from src.application import (
+from .application.exceptions import WrongDataException
+from .application import (
     CreateBook,
     SearchBook
 )
-from infrastructure.controllers.exceptions import BadRequestException
-from infrastructure.controllers.utils import utility
-
+from .infrastructure.controllers.exceptions import BadRequestException
+from .infrastructure.controllers.utils import DecimalEncoder
 
 app = Flask(__name__)
+CORS(app)
+app.json_encoder = DecimalEncoder
 
 
 @app.errorhandler(BadRequestException)
@@ -27,24 +30,14 @@ def handle_bad_request(error):
     return response
 
 
-@app.route('/book/create', methods=['POST'])
-def create():
+@app.route('/api/v1/book', methods=['POST', 'GET'])
+def books():
     if request.method == 'GET':
-        return jsonify({'status': 'alive!'})
+        data = asyncio.run(SearchBook().do(**request.args))
+        return jsonify(data)
 
-    plain_text = CreateBook().do()
-
-    return jsonify({'plain_text': plain_text})
-
-
-@app.route('/book', methods=['GET'])
-def search():
-    if request.method == 'GET':
-        return jsonify({'status': 'alive!'})
-
-    data = SearchBook().do()
-
-    return jsonify(data)
+    book = asyncio.run(CreateBook().do(**request.json))
+    return jsonify(book)
 
 
 if __name__ == '__main__':
