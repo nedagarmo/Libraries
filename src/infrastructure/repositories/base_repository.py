@@ -27,7 +27,6 @@ class BaseRepository(IRepository):
                                                                    | Attr('book_external_id').contains(query)
                                                                    | Attr('book_publication_date').contains(query)
             )
-
             items = [Book(**item) for item in result["Items"]]
             return items
 

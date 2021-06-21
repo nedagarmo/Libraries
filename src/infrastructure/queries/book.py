@@ -8,10 +8,10 @@ from ...application import SearchBook
 
 
 class BookQuery(graphene.ObjectType):
-    result = graphene.Field(type=BookListProtected)
+    result = graphene.Field(type=BookListProtected, args={"payload": graphene.NonNull(graphene.String)})
 
     @classmethod
     @query_header_jwt_required
-    def resolve_list(cls, _, info, payload):
+    def resolve_result(cls, _, info, payload):
         results = asyncio.run(SearchBook().do(payload))
         return BookListResponseField(list=results)

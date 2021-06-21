@@ -16,7 +16,7 @@ class Book(graphene.ObjectType):
     book_source = graphene.String(default_value="DB Interna")
 
     def __repr__(self):
-        return f'<Book {self.id}>'
+        return f'<Book {self.book_id}>'
 
     def to_dict(self):
         return {

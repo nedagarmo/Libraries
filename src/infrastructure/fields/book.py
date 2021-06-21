@@ -4,7 +4,7 @@ from ...domain.models import Book
 
 
 class BookListResponseField(graphene.ObjectType):
-    list = graphene.List(Book, payload=graphene.NonNull(graphene.String))
+    list = graphene.List(Book)
 
 
 class BookMutationResponseField(graphene.ObjectType):
