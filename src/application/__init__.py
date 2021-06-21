@@ -1,1 +1,1 @@
-from .services import CreateBook, SearchBook
+from .services import CreateBook, SearchBook, DeleteBook

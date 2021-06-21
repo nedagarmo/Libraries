@@ -3,6 +3,7 @@ from boto3.dynamodb.conditions import Key, Attr
 
 from ...config import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 from ...domain import IRepository
+from ...domain.models import Book
 
 
 class BaseRepository(IRepository):
@@ -26,7 +27,9 @@ class BaseRepository(IRepository):
                                                                    | Attr('book_external_id').contains(query)
                                                                    | Attr('book_publication_date').contains(query)
             )
-            return result
+
+            items = [Book(**item) for item in result["Items"]]
+            return items
 
     async def get_by_pk(self, query):
         async with aioboto3.resource(self.service, region_name=self.region, aws_access_key_id=AWS_ACCESS_KEY_ID,
@@ -56,5 +59,15 @@ class BaseRepository(IRepository):
         async with aioboto3.resource(self.service, region_name=self.region, aws_access_key_id=AWS_ACCESS_KEY_ID,
                                      aws_secret_access_key=AWS_SECRET_ACCESS_KEY) as client:
             table = await client.Table(self.table_name)
-            print(instance.to_dict())
-            return await table.put_item(Item=instance.to_dict())
+            result = await table.put_item(Item=instance.to_dict())
+            return result["ResponseMetadata"]["HTTPStatusCode"] == 200
+
+    async def delete(self, payload: dict):
+        async with aioboto3.resource(self.service, region_name=self.region, aws_access_key_id=AWS_ACCESS_KEY_ID,
+                                     aws_secret_access_key=AWS_SECRET_ACCESS_KEY) as client:
+            table = await client.Table(self.table_name)
+            result = await table.delete_item(
+                Key=payload
+            )
+
+            return result["ResponseMetadata"]["HTTPStatusCode"] == 200

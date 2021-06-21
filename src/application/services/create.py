@@ -12,15 +12,14 @@ class CreateBook(IService):
         :param kwargs: argumentos proporcionados para la creación de un libro
         :return: retorna un objeto con los datos de la nueva instancia
         """
-        book = Book(**kwargs, book_action='C')
+        book = Book(**kwargs)
 
-        if book.external_id and await self.exists('book_external_id', book.external_id):
+        if book.book_external_id and await self.exists('book_external_id', book.book_external_id):
             raise WrongDataException({"message": "Este libro ya existe en la base de datos de esta biblioteca!"})
 
         repository = BookRepository()
-        return await repository.insert(book)
+        return await repository.insert(book), book
 
     async def exists(self, field, query):
         result = await BookRepository().get_by({"field": field, "query": query})
-        print(result)
         return result["Count"] > 0

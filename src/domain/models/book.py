@@ -1,37 +1,34 @@
 import uuid
+import graphene
 
 
-class Book:
-
-    def __init__(self, book_id=None, book_external_id=None, book_name=None, book_subtitle=None, book_authors=None,
-                 book_categories=None, book_publication_date=None, book_editor=None, book_description=None,
-                 book_image=None, book_source=None, book_action='S'):
-        self.id = book_id or str(uuid.uuid4())
-        self.external_id = book_external_id
-        self.name = book_name
-        self.subtitle = book_subtitle
-        self.authors = book_authors or []
-        self.categories = book_categories or []
-        self.publication_date = book_publication_date
-        self.editor = book_editor
-        self.description = book_description
-        self.image = book_image
-        self.source = book_source or "DB Interna" if book_action == 'S' else "DB Interna"
+class Book(graphene.ObjectType):
+    book_id = graphene.String(default_value=str(uuid.uuid4()))
+    book_external_id = graphene.String()
+    book_name = graphene.NonNull(graphene.String)
+    book_subtitle = graphene.String()
+    book_authors = graphene.List(graphene.NonNull(graphene.String))
+    book_categories = graphene.List(graphene.NonNull(graphene.String))
+    book_publication_date = graphene.String(default_value="Desconocida")
+    book_editor = graphene.String(default_value="Desconocido")
+    book_description = graphene.String(default_value="Sin descripción")
+    book_image = graphene.String()
+    book_source = graphene.String(default_value="DB Interna")
 
     def __repr__(self):
         return f'<Book {self.id}>'
 
     def to_dict(self):
         return {
-            'book_id': self.id,
-            'book_external_id': self.external_id,
-            'book_name': self.name,
-            'book_subtitle': self.subtitle,
-            'book_authors': self.authors,
-            'book_categories': self.categories,
-            'book_publication_date': self.publication_date,
-            'book_editor': self.editor,
-            'book_description': self.description,
-            'book_image': self.image,
-            'book_source': self.source
+            'book_id': self.book_id,
+            'book_external_id': self.book_external_id,
+            'book_name': self.book_name,
+            'book_subtitle': self.book_subtitle,
+            'book_authors': self.book_authors,
+            'book_categories': self.book_categories,
+            'book_publication_date': self.book_publication_date,
+            'book_editor': self.book_editor,
+            'book_description': self.book_description,
+            'book_image': self.book_image,
+            'book_source': self.book_source
         }

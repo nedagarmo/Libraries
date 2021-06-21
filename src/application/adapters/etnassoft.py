@@ -23,5 +23,5 @@ class EtnassoftAdapter(IAdapter):
                                       book_authors=[book["author"]], book_categories=book["categories"],
                                       book_publication_date=book["publisher_date"], book_editor=book["publisher"],
                                       book_description=book["content"], book_image=book["thumbnail"],
-                                      book_source="Etnassoft").to_dict()
+                                      book_source="Etnassoft")
                 return results

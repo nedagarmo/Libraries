@@ -27,5 +27,5 @@ class GoogleAdapter(IAdapter):
                                         book_editor=book_info.get("publisher", None),
                                         book_description=book_info.get("description", None),
                                         book_image=book_info.get("imageLinks", {"thumbnail": None})["thumbnail"],
-                                        book_source="Google").to_dict())
+                                        book_source="Google"))
                 return results
